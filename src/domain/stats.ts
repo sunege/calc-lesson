@@ -51,17 +51,32 @@ export function starCount(mistakes: number): 1 | 2 | 3 {
   return 1
 }
 
-/** 0.1 秒単位に切り捨てた秒数 */
-function toTenths(ms: number): number {
-  return Math.floor(Math.max(0, ms) / 100)
+/** 1 秒単位に四捨五入した秒数 */
+export function roundSeconds(ms: number): number {
+  return Math.round(Math.max(0, ms) / 1000)
 }
 
-/** 「23.4びょう」「1ぷん 5.0びょう」の形にする */
+/** 四捨五入した秒数を「ふん(ぷん)」と「びょう」に分ける */
+export function timeParts(ms: number): { minutes: number; seconds: number } {
+  const total = roundSeconds(ms)
+  return { minutes: Math.floor(total / 60), seconds: total % 60 }
+}
+
+/**
+ * 「ふん」と「ぷん」の使い分け(教科書の読み方にあわせる)。
+ * 一の位が 1・3・6・8・0 のとき「ぷん」(いっぷん、さんぷん、ろっぷん、はっぷん、じゅっぷん)、
+ * それ以外は「ふん」(にふん、よんふん、ごふん、ななふん、きゅうふん)
+ */
+export function minuteUnit(minutes: number): 'ふん' | 'ぷん' {
+  return [1, 3, 6, 8, 0].includes(minutes % 10) ? 'ぷん' : 'ふん'
+}
+
+/** 「45びょう」「2ふん15びょう」「1ぷん」の形にする(1 秒未満は四捨五入) */
 export function formatTime(ms: number): string {
-  const tenths = toTenths(ms)
-  const minutes = Math.floor(tenths / 600)
-  const seconds = ((tenths % 600) / 10).toFixed(1)
-  return minutes > 0 ? `${minutes}ぷん ${seconds}びょう` : `${seconds}びょう`
+  const { minutes, seconds } = timeParts(ms)
+  if (minutes === 0) return `${seconds}びょう`
+  const m = `${minutes}${minuteUnit(minutes)}`
+  return seconds === 0 ? m : `${m}${seconds}びょう`
 }
 
 /** 問題画面のストップウォッチ表示用(「0:42」の形) */
@@ -72,7 +87,11 @@ export function formatClock(ms: number): string {
   return `${minutes}:${String(seconds).padStart(2, '0')}`
 }
 
-/** 差分の表示用(「2.3びょう」) */
-export function formatDiff(ms: number): string {
-  return formatTime(Math.abs(ms))
+/**
+ * 「まえより ○○ はやく なったよ」の ○○。
+ * 画面に出ているタイムどうしの差にする。差が 1 秒にならないときは「すこし」
+ */
+export function formatFaster(beforeMs: number, afterMs: number): string {
+  const diff = roundSeconds(beforeMs) - roundSeconds(afterMs)
+  return diff >= 1 ? formatTime(diff * 1000) : 'すこし'
 }

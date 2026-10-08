@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest'
-import { bestTime, formatClock, formatTime, starCount, summarize, type PlayRecord } from './stats'
+import {
+  bestTime,
+  formatClock,
+  formatFaster,
+  formatTime,
+  minuteUnit,
+  starCount,
+  summarize,
+  type PlayRecord,
+} from './stats'
 
 const rec = (timeMs: number, mistakes = 0): PlayRecord => ({
   timeMs,
@@ -37,11 +46,48 @@ describe('summarize', () => {
 })
 
 describe('表示用の関数', () => {
-  it('formatTime', () => {
-    expect(formatTime(5432)).toBe('5.4びょう')
-    expect(formatTime(45000)).toBe('45.0びょう')
-    expect(formatTime(83456)).toBe('1ぷん 23.4びょう')
-    expect(formatTime(120000)).toBe('2ぷん 0.0びょう')
+  it('formatTime は 1 秒単位に四捨五入して「ふん」「びょう」で表す', () => {
+    expect(formatTime(5432)).toBe('5びょう')
+    expect(formatTime(45000)).toBe('45びょう')
+    expect(formatTime(59600)).toBe('1ぷん')
+    expect(formatTime(134500)).toBe('2ふん15びょう')
+    expect(formatTime(134400)).toBe('2ふん14びょう')
+    expect(formatTime(120000)).toBe('2ふん')
+  })
+
+  it('formatFaster は表示中のタイムどうしの差にする', () => {
+    expect(formatFaster(30000, 25000)).toBe('5びょう')
+    expect(formatFaster(10400, 9600)).toBe('すこし')
+    expect(formatFaster(134500, 60000)).toBe('1ぷん15びょう')
+  })
+
+  it('minuteUnit は教科書の読み方にあわせて「ぷん」と「ふん」を使い分ける', () => {
+    const units = Array.from({ length: 21 }, (_, i) => i + 1).map((m) => `${m}${minuteUnit(m)}`)
+    expect(units).toEqual([
+      '1ぷん',
+      '2ふん',
+      '3ぷん',
+      '4ふん',
+      '5ふん',
+      '6ぷん',
+      '7ふん',
+      '8ぷん',
+      '9ふん',
+      '10ぷん',
+      '11ぷん',
+      '12ふん',
+      '13ぷん',
+      '14ふん',
+      '15ふん',
+      '16ぷん',
+      '17ふん',
+      '18ぷん',
+      '19ふん',
+      '20ぷん',
+      '21ぷん',
+    ])
+    expect(formatTime(3 * 60000 + 5000)).toBe('3ぷん5びょう')
+    expect(formatTime(10 * 60000)).toBe('10ぷん')
   })
 
   it('formatClock', () => {

@@ -42,3 +42,21 @@
 .pad[data-disabled='true'] .key {
   opacity: 0.85;
 }
+
+@media (max-width: 600px), (max-height: 520px) {
+  .pad {
+    gap: 8px;
+  }
+
+  .key {
+    min-width: 0;
+    min-height: 48px;
+    font-size: clamp(26px, 8vmin, 40px);
+    border-width: 2px;
+  }
+
+  .erase,
+  .submit {
+    font-size: 18px;
+  }
+}

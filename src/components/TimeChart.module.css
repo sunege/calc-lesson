@@ -1,7 +1,8 @@
 .chart {
   display: block;
+  /* 親の はば と 高さ の どちらにも おさまる 大きさで 表示する */
   width: 100%;
-  height: auto;
+  height: 100%;
   font-family: inherit;
   overflow: visible;
 }
@@ -17,7 +18,7 @@
 }
 
 .tick {
-  font-size: 18px;
+  font-size: 17px;
   fill: var(--ink-soft);
 }
 
@@ -46,15 +47,20 @@
 }
 
 .value {
-  font-size: 18px;
+  font-size: 21px;
   fill: var(--ink-soft);
   animation: appear 0.3s ease-out both;
 }
 
 .valueLatest {
-  font-size: 22px;
+  font-size: 23px;
   fill: var(--theme);
   font-weight: 900;
+}
+
+/* 「ふん」「びょう」は数字より小さくして、となりの ぼう と重ならないようにする */
+.unit {
+  font-size: 0.7em;
 }
 
 .crown {
@@ -63,12 +69,12 @@
 }
 
 .xLabel {
-  font-size: 18px;
+  font-size: 20px;
   fill: var(--ink-soft);
 }
 
 .nowLabel {
-  font-size: 18px;
+  font-size: 20px;
   fill: var(--theme);
   font-weight: 900;
 }

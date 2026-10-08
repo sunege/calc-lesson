@@ -1,4 +1,5 @@
-import type { PlayRecord } from '../domain/stats'
+import type { CSSProperties } from 'react'
+import { formatTime, minuteUnit, timeParts, type PlayRecord } from '../domain/stats'
 import styles from './TimeChart.module.css'
 
 interface Props {
@@ -7,11 +8,13 @@ interface Props {
   maxBars?: number
 }
 
-const W = 640
-const H = 320
-const M = { top: 48, right: 16, bottom: 52, left: 56 }
-const PLOT_W = W - M.left - M.right
+/** ぼう 1本ぶんの はば */
+const SLOT = 72
+const H = 360
+const M = { top: 92, right: 16, bottom: 60, left: 128 }
 const PLOT_H = H - M.top - M.bottom
+/** 2行の ラベル の 行の高さ */
+const LINE = 22
 
 const TICK_STEPS_SEC = [1, 2, 5, 10, 15, 20, 30, 60, 120, 300, 600]
 
@@ -22,12 +25,45 @@ function niceScale(maxSec: number) {
   return { step, top }
 }
 
-// formatTime と同じく 0.1 秒未満は切り捨てる
-const fmtSec = (ms: number) => (Math.floor(ms / 100) / 10).toFixed(1)
+/** 「2ふん」「15びょう」のように、1行ずつに分ける */
+function labelLines(ms: number): [number, string][] {
+  const { minutes, seconds } = timeParts(ms)
+  if (minutes === 0) return [[seconds, 'びょう']]
+  if (seconds === 0) return [[minutes, minuteUnit(minutes)]]
+  return [
+    [minutes, minuteUnit(minutes)],
+    [seconds, 'びょう'],
+  ]
+}
+
+interface TimeLabelProps {
+  x: number
+  /** いちばん下の行の位置 */
+  y: number
+  ms: number
+  className: string
+  style?: CSSProperties
+}
+
+/** ぼう の 上に出す タイム。1分をこえたら「○ふん」「○びょう」の2行にする */
+function TimeLabel({ x, y, ms, className, style }: TimeLabelProps) {
+  const lines = labelLines(ms)
+  return (
+    <text x={x} y={y - (lines.length - 1) * LINE} textAnchor="middle" className={className} style={style}>
+      {lines.map(([n, unit], i) => (
+        <tspan key={unit} x={x} dy={i === 0 ? 0 : LINE}>
+          {n}
+          <tspan className={styles.unit}>{unit}</tspan>
+        </tspan>
+      ))}
+    </text>
+  )
+}
 
 export function TimeChart({ records, maxBars = 10 }: Props) {
   if (records.length === 0) return null
 
+  const W = M.left + M.right + SLOT * maxBars
   const offset = Math.max(0, records.length - maxBars)
   const visible = records.slice(offset)
   const bestMs = Math.min(...records.map((r) => r.timeMs))
@@ -36,8 +72,7 @@ export function TimeChart({ records, maxBars = 10 }: Props) {
 
   const { step, top } = niceScale((Math.max(...visible.map((r) => r.timeMs), bestMs) / 1000) * 1.08)
   const y = (ms: number) => M.top + PLOT_H - (ms / 1000 / top) * PLOT_H
-  const slot = PLOT_W / maxBars
-  const barW = slot * 0.62
+  const barW = SLOT * 0.62
   const ticks = Array.from({ length: Math.floor(top / step) + 1 }, (_, i) => i * step)
 
   return (
@@ -47,21 +82,21 @@ export function TimeChart({ records, maxBars = 10 }: Props) {
         <g key={t}>
           <line x1={M.left} x2={W - M.right} y1={y(t * 1000)} y2={y(t * 1000)} className={styles.grid} />
           <text x={M.left - 10} y={y(t * 1000)} className={styles.tick} textAnchor="end" dominantBaseline="middle">
-            {t}
+            {t === 0 ? '0' : formatTime(t * 1000)}
           </text>
         </g>
       ))}
-      <text x={M.left - 10} y={M.top - 22} className={styles.axisLabel} textAnchor="end">
-        びょう
-      </text>
 
       {/* ぼう */}
       {visible.map((r, i) => {
         const index = offset + i
         const isLatest = index === latestIndex
         const isBest = index === bestIndex
-        const x = M.left + slot * i + (slot - barW) / 2
+        const x = M.left + SLOT * i + (SLOT - barW) / 2
+        const cx = x + barW / 2
         const barTop = y(r.timeMs)
+        const labelBottom = barTop - 8
+        const labelTop = labelBottom - (labelLines(r.timeMs).length - 1) * LINE - 16
         const delay = isLatest ? 0.5 : i * 0.05
         return (
           <g key={index}>
@@ -74,19 +109,17 @@ export function TimeChart({ records, maxBars = 10 }: Props) {
               className={`${styles.bar} ${isLatest ? styles.latest : ''} ${isBest ? styles.best : ''}`}
               style={{ animationDelay: `${delay}s` }}
             />
-            <text
-              x={x + barW / 2}
-              y={barTop - 8}
+            <TimeLabel
+              x={cx}
+              y={labelBottom}
+              ms={r.timeMs}
               className={`${styles.value} ${isLatest ? styles.valueLatest : ''}`}
-              textAnchor="middle"
               style={{ animationDelay: `${delay + 0.4}s` }}
-            >
-              {fmtSec(r.timeMs)}
-            </text>
+            />
             {isBest && (
               <text
-                x={x + barW / 2}
-                y={barTop - 30}
+                x={cx}
+                y={labelTop - 6}
                 className={styles.crown}
                 textAnchor="middle"
                 style={{ animationDelay: `${delay + 0.5}s` }}
@@ -94,11 +127,11 @@ export function TimeChart({ records, maxBars = 10 }: Props) {
                 👑
               </text>
             )}
-            <text x={x + barW / 2} y={H - M.bottom + 24} className={styles.xLabel} textAnchor="middle">
+            <text x={cx} y={H - M.bottom + 26} className={styles.xLabel} textAnchor="middle">
               {index + 1}
             </text>
             {isLatest && (
-              <text x={x + barW / 2} y={H - M.bottom + 46} className={styles.nowLabel} textAnchor="middle">
+              <text x={cx} y={H - M.bottom + 52} className={styles.nowLabel} textAnchor="middle">
                 こんかい
               </text>
             )}
@@ -110,7 +143,7 @@ export function TimeChart({ records, maxBars = 10 }: Props) {
       <line x1={M.left} x2={W - M.right} y1={y(bestMs)} y2={y(bestMs)} className={styles.bestLine} />
 
       <line x1={M.left} x2={W - M.right} y1={M.top + PLOT_H} y2={M.top + PLOT_H} className={styles.axis} />
-      <text x={M.left - 10} y={H - M.bottom + 24} className={styles.axisLabel} textAnchor="end">
+      <text x={M.left - 10} y={H - M.bottom + 26} className={styles.axisLabel} textAnchor="end">
         かいめ
       </text>
     </svg>

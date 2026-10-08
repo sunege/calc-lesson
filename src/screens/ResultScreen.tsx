@@ -3,8 +3,9 @@ import { playBest } from '../audio/sound'
 import { Mascot } from '../components/Mascot'
 import { TimeChart } from '../components/TimeChart'
 import { getModeInfo, type ModeId } from '../domain/modes'
-import { formatDiff, formatTime, starCount, summarize, type PlayRecord, type ResultSummary } from '../domain/stats'
+import { formatFaster, formatTime, starCount, summarize, type PlayRecord, type ResultSummary } from '../domain/stats'
 import { fireBest, fireCorrect } from '../effects/confetti'
+import { useMediaQuery } from '../hooks/useMediaQuery'
 import styles from './ResultScreen.module.css'
 
 interface Props {
@@ -20,7 +21,7 @@ function messages(s: ResultSummary): string[] {
   const lines: string[] = []
   const prev = s.fasterThanPreviousMs ?? 0
   if (s.isNewBest) lines.push('👑 じこベスト こうしん!')
-  if (prev > 0) lines.push(`まえより ${formatDiff(prev)} はやく なったよ!`)
+  if (prev > 0) lines.push(`まえより ${formatFaster(s.latest.timeMs + prev, s.latest.timeMs)} はやく なったよ!`)
   else if (!s.isNewBest) lines.push('おしい! つぎは もっと はやく なるよ!')
   return lines
 }
@@ -31,6 +32,8 @@ export function ResultScreen({ mode, records, onRetry, onBack }: Props) {
   const stars = starCount(summary.latest.mistakes)
   const fromFirst = summary.fasterThanFirstMs
   const celebrated = useRef(false)
+  // スマホでは グラフ の ぼう を へらして、文字を 大きく する
+  const narrow = useMediaQuery('(max-width: 600px)')
 
   useEffect(() => {
     if (celebrated.current) return
@@ -51,12 +54,23 @@ export function ResultScreen({ mode, records, onRetry, onBack }: Props) {
         </div>
       )}
 
+      {/* ボタンは画面の上におく(画面の下はスワイプの操作とぶつかりやすいため) */}
       <header className={styles.header}>
-        <Mascot mood="happy" size={88} className={styles.mascot} />
-        <h1 className={styles.title}>
-          クリア! <span className={styles.modeName}>{info.title}</span>
-          <span className={styles.modeSub}>{info.subtitle}</span>
-        </h1>
+        <div className={styles.heading}>
+          <Mascot mood="happy" size={narrow ? 64 : 88} className={styles.mascot} />
+          <h1 className={styles.title}>
+            クリア! <span className={styles.modeName}>{info.title}</span>
+            <span className={styles.modeSub}>{info.subtitle}</span>
+          </h1>
+        </div>
+        <div className={styles.buttons}>
+          <button type="button" className={`pop-button ${styles.retry}`} onClick={onRetry}>
+            もういちど
+          </button>
+          <button type="button" className={`pop-button ${styles.back}`} onClick={onBack}>
+            ほかの もんだい
+          </button>
+        </div>
       </header>
 
       <div className={styles.body}>
@@ -99,24 +113,18 @@ export function ResultScreen({ mode, records, onRetry, onBack }: Props) {
           <h2 className={styles.chartTitle}>
             きみの きろく <span className={styles.chartHint}>(ぼうが みじかいほど はやい!)</span>
           </h2>
-          <TimeChart records={records} />
+          <div className={styles.chart}>
+            <TimeChart records={records} maxBars={narrow ? 5 : 10} />
+          </div>
           {fromFirst !== null && fromFirst > 0 && (
             <p className={styles.fromFirst}>
-              🎉 さいしょ より <strong>{formatDiff(fromFirst)}</strong> はやく なったよ!
+              🎉 さいしょ より <strong>{formatFaster(records[0].timeMs, summary.latest.timeMs)}</strong> はやく
+              なったよ!
             </p>
           )}
           <p className={styles.playCount}>{summary.playCount}かいめ の ちょうせん</p>
         </section>
       </div>
-
-      <footer className={styles.buttons}>
-        <button type="button" className={`pop-button ${styles.retry}`} onClick={onRetry}>
-          もういちど
-        </button>
-        <button type="button" className={`pop-button ${styles.back}`} onClick={onBack}>
-          ほかの もんだい
-        </button>
-      </footer>
     </div>
   )
 }

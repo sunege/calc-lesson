@@ -49,6 +49,11 @@ body,
   margin: 0;
 }
 
+/* スマホのブラウザでは アドレスバー の ぶん 画面がせまくなるので、実際に見えている高さにあわせる */
+#root {
+  height: 100dvh;
+}
+
 body {
   background-color: var(--bg);
   background-image: radial-gradient(var(--bg-dot) 2.5px, transparent 2.5px);
