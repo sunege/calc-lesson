@@ -1,11 +1,12 @@
 import { Mascot } from '../components/Mascot'
+import { bestCorrect, isChallengeMode, rankFor } from '../domain/challenge'
 import { FIRST_GRADE_MODES, KUKU_DANS, KUKU_ORDERS, getModeInfo, kukuModeId, type ModeId } from '../domain/modes'
 import { bestTime, formatTime } from '../domain/stats'
 import { useData } from '../storage/useData'
 import styles from './TitleScreen.module.css'
 
 interface Props {
-  onStart: (mode: ModeId) => void
+  onSelect: (mode: ModeId) => void
   onKuku: () => void
   onSettings: () => void
 }
@@ -26,25 +27,31 @@ function ModeCard({
   onClick: () => void
 }) {
   const { data } = useData()
-  const records = mode ? data.records[mode] : undefined
-  const best = bestTime(records)
+  const best = bestTime(mode ? data.records[mode] : undefined)
+  const challengeBest = mode && isChallengeMode(mode) ? bestCorrect(data.challenges[mode]) : null
   return (
     <button type="button" className={`pop-button ${styles.card}`} data-theme={theme} onClick={onClick}>
       <span className={styles.icon}>{icon}</span>
       <span className={styles.cardTitle}>{title}</span>
       <span className={styles.cardSub}>{subtitle}</span>
-      {mode && (
-        <span className={styles.cardRecord}>
-          {best === null ? 'まだ きろく なし' : `👑 ${formatTime(best)}・${records!.length}かい`}
+      {mode && best === null && challengeBest === null && <span className={styles.cardRecord}>まだ きろく なし</span>}
+      {(best !== null || challengeBest !== null) && (
+        <span className={styles.cardRecords}>
+          {best !== null && <span className={styles.cardRecord}>📝 {formatTime(best)}</span>}
+          {mode && challengeBest !== null && isChallengeMode(mode) && (
+            <span className={styles.cardRecord}>
+              ⏱️ {challengeBest}もん {rankFor(mode, challengeBest).rank.icon}
+            </span>
+          )}
         </span>
       )}
     </button>
   )
 }
 
-const ICONS: Partial<Record<ModeId, string>> = { add1: '🍎', sub1: '🍊', add2: '🚀', sub2: '🐬' }
+const ICONS: Partial<Record<ModeId, string>> = { add1: '🍎', sub1: '🍊', add2: '🎈', sub2: '🐬' }
 
-export function TitleScreen({ onStart, onKuku, onSettings }: Props) {
+export function TitleScreen({ onSelect, onKuku, onSettings }: Props) {
   const { data } = useData()
   const kukuPlays = KUKU_DANS.flatMap((d) =>
     KUKU_ORDERS.map((o) => data.records[kukuModeId(d, o)]?.length ?? 0),
@@ -78,7 +85,7 @@ export function TitleScreen({ onStart, onKuku, onSettings }: Props) {
                 subtitle={info.subtitle}
                 theme={info.theme}
                 icon={ICONS[id] ?? '⭐'}
-                onClick={() => onStart(id)}
+                onClick={() => onSelect(id)}
               />
             )
           })}
@@ -104,7 +111,7 @@ export function TitleScreen({ onStart, onKuku, onSettings }: Props) {
             subtitle={master.subtitle}
             theme={master.theme}
             icon="🏆"
-            onClick={() => onStart('kuku-master')}
+            onClick={() => onSelect('kuku-master')}
           />
         </div>
       </section>

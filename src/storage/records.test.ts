@@ -3,6 +3,7 @@ import type { PlayRecord } from '../domain/stats'
 import {
   MAX_RECORDS_PER_MODE,
   STORAGE_KEY,
+  addChallengeRecord,
   addRecord,
   clearRecords,
   emptyData,
@@ -73,10 +74,44 @@ describe('記録の追加と削除', () => {
 
   it('モードごと・ぜんぶ 消せる', () => {
     let data = addRecord(addRecord(emptyData(), 'add1', rec(1)), 'add2', rec(2))
-    data = clearRecords(data, 'add1')
+    data = clearRecords(data, { mode: 'add1', kind: 'practice' })
     expect(data.records.add1).toBeUndefined()
     expect(data.records.add2).toHaveLength(1)
     expect(clearRecords(data).records).toEqual({})
+  })
+})
+
+describe('チャレンジの記録', () => {
+  const ch = (correct: number) => ({ correct, mistakes: 1, playedAt: '2026-10-08T00:00:00.000Z' })
+
+  it('れんしゅう とは別に保存・読み込みできる', () => {
+    const storage = new MemoryStorage()
+    let data = addRecord(emptyData(), 'add1', rec(30000))
+    data = addChallengeRecord(data, 'add1', ch(12))
+    saveData(data, storage)
+    const loaded = loadData(storage)
+    expect(loaded.records.add1).toHaveLength(1)
+    expect(loaded.challenges.add1).toEqual([ch(12)])
+  })
+
+  it('チャレンジの記録だけを消せる。ぜんぶ消すと両方消える', () => {
+    let data = addChallengeRecord(addRecord(emptyData(), 'add1', rec(1)), 'add1', ch(5))
+    data = clearRecords(data, { mode: 'add1', kind: 'challenge' })
+    expect(data.challenges.add1).toBeUndefined()
+    expect(data.records.add1).toHaveLength(1)
+    data = clearRecords(addChallengeRecord(data, 'sub2', ch(3)))
+    expect(data.records).toEqual({})
+    expect(data.challenges).toEqual({})
+  })
+
+  it('challenges がない古いデータも読める。おかしな記録とチャレンジのないモードは捨てる', () => {
+    expect(parseData(JSON.stringify({ version: 1, records: {} })).challenges).toEqual({})
+    const raw = JSON.stringify({
+      version: 1,
+      records: {},
+      challenges: { add2: [ch(9), { correct: -1, mistakes: 0, playedAt: 'x' }], 'kuku-3-seq': [ch(1)] },
+    })
+    expect(parseData(raw).challenges).toEqual({ add2: [ch(9)] })
   })
 })
 

@@ -2,8 +2,10 @@ import { useState } from 'react'
 import { playCorrect, unlockAudio } from '../audio/sound'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { HoldButton } from '../components/HoldButton'
-import { ALL_MODES, type ModeId } from '../domain/modes'
+import { CHALLENGE_MODES, bestCorrect } from '../domain/challenge'
+import { ALL_MODES, getModeInfo, type ModeId } from '../domain/modes'
 import { bestTime, formatTime } from '../domain/stats'
+import type { RecordKind } from '../storage/records'
 import { useData } from '../storage/useData'
 import styles from './SettingsScreen.module.css'
 
@@ -11,12 +13,32 @@ interface Props {
   onBack: () => void
 }
 
-type DeleteTarget = { mode: ModeId; label: string } | 'all'
+type DeleteTarget = { mode: ModeId; kind: RecordKind; label: string } | 'all'
+
+interface Row {
+  mode: ModeId
+  kind: RecordKind
+  label: string
+  count: number
+  best: string
+}
 
 export function SettingsScreen({ onBack }: Props) {
   const { data, storageAvailable, setSound, clearRecords } = useData()
   const [target, setTarget] = useState<DeleteTarget | null>(null)
-  const played = ALL_MODES.filter((m) => (data.records[m.id]?.length ?? 0) > 0)
+  const practiceRows: Row[] = ALL_MODES.flatMap((m) => {
+    const records = data.records[m.id] ?? []
+    if (records.length === 0) return []
+    const label = `${m.title}(${m.subtitle})`
+    return [{ mode: m.id, kind: 'practice', label, count: records.length, best: formatTime(bestTime(records) ?? 0) }]
+  })
+  const challengeRows: Row[] = CHALLENGE_MODES.flatMap((mode) => {
+    const records = data.challenges[mode] ?? []
+    if (records.length === 0) return []
+    const label = `${getModeInfo(mode).title}(チャレンジ)`
+    return [{ mode, kind: 'challenge', label, count: records.length, best: `${bestCorrect(records) ?? 0}もん` }]
+  })
+  const played = [...practiceRows, ...challengeRows]
 
   return (
     <div className={`screen ${styles.root}`}>
@@ -77,20 +99,18 @@ export function SettingsScreen({ onBack }: Props) {
               </tr>
             </thead>
             <tbody>
-              {played.map((m) => {
-                const records = data.records[m.id] ?? []
-                const label = `${m.title}(${m.subtitle})`
-                return (
-                  <tr key={m.id}>
-                    <td>{label}</td>
-                    <td>{records.length}</td>
-                    <td>{formatTime(bestTime(records) ?? 0)}</td>
-                    <td>
-                      <HoldButton onHold={() => setTarget({ mode: m.id, label })}>長押しで削除</HoldButton>
-                    </td>
-                  </tr>
-                )
-              })}
+              {played.map((row) => (
+                <tr key={`${row.kind}:${row.mode}`}>
+                  <td>{row.label}</td>
+                  <td>{row.count}</td>
+                  <td>{row.best}</td>
+                  <td>
+                    <HoldButton onHold={() => setTarget({ mode: row.mode, kind: row.kind, label: row.label })}>
+                      長押しで削除
+                    </HoldButton>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         )}
@@ -107,7 +127,7 @@ export function SettingsScreen({ onBack }: Props) {
           yesLabel="削除する"
           noLabel="やめる"
           onYes={() => {
-            clearRecords(target === 'all' ? undefined : target.mode)
+            clearRecords(target === 'all' ? undefined : { mode: target.mode, kind: target.kind })
             setTarget(null)
           }}
           onNo={() => setTarget(null)}

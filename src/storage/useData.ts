@@ -1,13 +1,16 @@
 import { createContext, useContext } from 'react'
+import type { ChallengeModeId, ChallengeRecord } from '../domain/challenge'
 import type { ModeId } from '../domain/modes'
 import type { PlayRecord } from '../domain/stats'
-import type { StoredData } from './records'
+import type { RecordKind, StoredData } from './records'
 
 export interface DataContextValue {
   data: StoredData
   storageAvailable: boolean
   addRecord: (mode: ModeId, record: PlayRecord) => void
-  clearRecords: (mode?: ModeId) => void
+  addChallengeRecord: (mode: ChallengeModeId, record: ChallengeRecord) => void
+  /** target を省略すると、すべての記録を消す */
+  clearRecords: (target?: { mode: ModeId; kind: RecordKind }) => void
   setSound: (sound: boolean) => void
 }
 

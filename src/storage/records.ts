@@ -1,3 +1,4 @@
+import { isChallengeMode, type ChallengeModeId, type ChallengeRecord } from '../domain/challenge'
 import { isModeId, type ModeId } from '../domain/modes'
 import type { PlayRecord } from '../domain/stats'
 
@@ -11,11 +12,17 @@ export interface Settings {
 export interface StoredData {
   version: 1
   settings: Settings
+  /** れんしゅう の記録(クリアタイム) */
   records: Partial<Record<ModeId, PlayRecord[]>>
+  /** チャレンジ の記録(1ぷんで といた数) */
+  challenges: Partial<Record<ChallengeModeId, ChallengeRecord[]>>
 }
 
+/** どちらの記録か */
+export type RecordKind = 'practice' | 'challenge'
+
 export function emptyData(): StoredData {
-  return { version: 1, settings: { sound: true }, records: {} }
+  return { version: 1, settings: { sound: true }, records: {}, challenges: {} }
 }
 
 type StorageLike = Pick<Storage, 'getItem' | 'setItem'>
@@ -56,6 +63,12 @@ function isPlayRecord(v: unknown): v is PlayRecord {
   )
 }
 
+const isCount = (v: unknown): v is number => typeof v === 'number' && Number.isInteger(v) && v >= 0
+
+function isChallengeRecord(v: unknown): v is ChallengeRecord {
+  return isObject(v) && isCount(v.correct) && isCount(v.mistakes) && typeof v.playedAt === 'string'
+}
+
 /** 壊れている部分は捨てて、読める部分だけを取り出す */
 export function parseData(raw: string | null): StoredData {
   if (raw === null) return emptyData()
@@ -76,6 +89,14 @@ export function parseData(raw: string | null): StoredData {
       if (!isModeId(mode) || !Array.isArray(list)) continue
       const valid = list.filter(isPlayRecord).slice(-MAX_RECORDS_PER_MODE)
       if (valid.length > 0) data.records[mode] = valid
+    }
+  }
+  // challenges は あとから ふえた項目なので、ない場合は空のままにする
+  if (isObject(json.challenges)) {
+    for (const [mode, list] of Object.entries(json.challenges)) {
+      if (!isModeId(mode) || !isChallengeMode(mode) || !Array.isArray(list)) continue
+      const valid = list.filter(isChallengeRecord).slice(-MAX_RECORDS_PER_MODE)
+      if (valid.length > 0) data.challenges[mode] = valid
     }
   }
   return data
@@ -106,10 +127,21 @@ export function addRecord(data: StoredData, mode: ModeId, record: PlayRecord): S
   return { ...data, records: { ...data.records, [mode]: list } }
 }
 
-export function clearRecords(data: StoredData, mode?: ModeId): StoredData {
-  if (!mode) return { ...data, records: {} }
+export function addChallengeRecord(data: StoredData, mode: ChallengeModeId, record: ChallengeRecord): StoredData {
+  const list = [...(data.challenges[mode] ?? []), record].slice(-MAX_RECORDS_PER_MODE)
+  return { ...data, challenges: { ...data.challenges, [mode]: list } }
+}
+
+/** target を省略すると、れんしゅう・チャレンジ の記録をすべて消す */
+export function clearRecords(data: StoredData, target?: { mode: ModeId; kind: RecordKind }): StoredData {
+  if (!target) return { ...data, records: {}, challenges: {} }
+  if (target.kind === 'challenge') {
+    const challenges = { ...data.challenges }
+    if (isChallengeMode(target.mode)) delete challenges[target.mode]
+    return { ...data, challenges }
+  }
   const records = { ...data.records }
-  delete records[mode]
+  delete records[target.mode]
   return { ...data, records }
 }
 

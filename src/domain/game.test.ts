@@ -90,6 +90,22 @@ describe('判定と進行', () => {
   })
 })
 
+describe('チャレンジ', () => {
+  it('正解した数を数える', () => {
+    const s = run(createGame(problems), ...digits('7'), { type: 'submit' }, { type: 'advance' })
+    expect(s.correctCount).toBe(1)
+  })
+
+  it('時間ぎれになると、それ以上は入力できない', () => {
+    let s = run(createGame(problems), ...digits('1'), { type: 'timeUp' })
+    expect(s.phase).toBe('timeup')
+    s = run(s, ...digits('7'), { type: 'submit' }, { type: 'advance' })
+    expect(s.phase).toBe('timeup')
+    expect(s.index).toBe(0)
+    expect(s.correctCount).toBe(0)
+  })
+})
+
 describe('isStreakMilestone', () => {
   it('3, 5, 10, 15 … が節目', () => {
     const hits = Array.from({ length: 21 }, (_, i) => i).filter(isStreakMilestone)

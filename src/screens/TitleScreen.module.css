@@ -97,6 +97,14 @@
   color: var(--ink-soft);
 }
 
+.cardRecords {
+  margin-top: auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 6px;
+}
+
 .cardRecord {
   margin-top: auto;
   font-size: 16px;

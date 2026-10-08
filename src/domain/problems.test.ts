@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import { KUKU_DANS, kukuModeId } from './modes'
-import { KUKU_MASTER_COUNT, generateProblems, problemKey, problemPool, shuffle, type Problem } from './problems'
+import {
+  KUKU_MASTER_COUNT,
+  generateEndlessProblems,
+  generateProblems,
+  problemKey,
+  problemPool,
+  shuffle,
+  type Problem,
+} from './problems'
 
 const keys = (ps: Problem[]) => ps.map(problemKey)
 const hasNoDuplicates = (ps: Problem[]) => new Set(keys(ps)).size === ps.length
@@ -139,6 +147,30 @@ describe('九九', () => {
       }
     }
     expect(problemPool('kuku-master')).toHaveLength(72)
+  })
+})
+
+describe('チャレンジ用の問題(generateEndlessProblems)', () => {
+  it.each(['add1', 'sub1', 'add2', 'sub2', 'kuku-master'] as const)(
+    '%s: 全問を出しおえるまで重複せず、そのあと また全問を出す',
+    (mode) => {
+      const pool = problemPool(mode)
+      for (let seed = 1; seed <= 10; seed++) {
+        const ps = generateEndlessProblems(mode, pool.length * 3 + 5, seededRng(seed))
+        expect(ps).toHaveLength(pool.length * 3 + 5)
+        for (let c = 0; c < 3; c++) {
+          const cycle = ps.slice(c * pool.length, (c + 1) * pool.length)
+          expect(keys(cycle).sort()).toEqual(keys(pool).sort())
+        }
+        // 同じ問題が2回つづかない(ひとまわりの つなぎ目も ふくめて)
+        for (let i = 1; i < ps.length; i++) expect(problemKey(ps[i])).not.toBe(problemKey(ps[i - 1]))
+      }
+    },
+  )
+
+  it('九九マスターのチャレンジは 72問すべてから出す', () => {
+    const ps = generateEndlessProblems('kuku-master', 72, seededRng(3))
+    expect(new Set(keys(ps)).size).toBe(72)
   })
 })
 

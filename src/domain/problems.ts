@@ -88,6 +88,25 @@ export function generateProblems(mode: ModeId, rng: Rng = Math.random): Problem[
   return shuffle(pool, rng)
 }
 
+/**
+ * チャレンジ用に、問題を count 問ならべる。
+ * 全問を重複なくシャッフルして出し、出しおえたら また シャッフルして つづける。
+ * つなぎ目で同じ問題が2回つづかないようにする。
+ */
+export function generateEndlessProblems(mode: ModeId, count: number, rng: Rng = Math.random): Problem[] {
+  const pool = problemPool(mode)
+  const out: Problem[] = []
+  while (out.length < count) {
+    const cycle = shuffle(pool, rng)
+    const last = out[out.length - 1]
+    if (last && cycle.length > 1 && problemKey(cycle[0]) === problemKey(last)) {
+      ;[cycle[0], cycle[1]] = [cycle[1], cycle[0]]
+    }
+    out.push(...cycle)
+  }
+  return out.slice(0, count)
+}
+
 export function problemKey(p: Problem): string {
   return `${p.a}${p.op}${p.b}`
 }

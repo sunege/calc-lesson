@@ -126,3 +126,14 @@ export function playBest() {
     tone({ freq, at: i * 0.08, duration: i === notes.length - 1 ? 0.6 : 0.12, type: 'triangle', volume: 0.22 }),
   )
 }
+
+/** チャレンジの のこり時間が すくないときの「カチッ」。urgent でより高く、強くする */
+export function playTick(urgent = false) {
+  tone({ freq: urgent ? 1320 : 990, duration: 0.07, type: 'square', volume: urgent ? 0.09 : 0.06 })
+}
+
+/** 時間ぎれの「ピピー!」 */
+export function playTimeUp() {
+  tone({ freq: 1568, duration: 0.12, type: 'square', volume: 0.1 })
+  tone({ freq: 1568, at: 0.16, duration: 0.5, type: 'square', volume: 0.1 })
+}

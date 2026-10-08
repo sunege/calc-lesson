@@ -103,3 +103,23 @@
     transform: translateY(-40px);
   }
 }
+
+/* ランクの さかいめ など の 目じるし */
+.guide {
+  stroke: var(--line);
+  stroke-width: 2;
+  stroke-dasharray: 3 6;
+}
+
+.guideReached {
+  stroke: var(--theme);
+  opacity: 0.5;
+}
+
+.guideLabel {
+  font-size: 18px;
+}
+
+.guideLabelDim {
+  opacity: 0.35;
+}

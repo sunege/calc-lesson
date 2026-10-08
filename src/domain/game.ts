@@ -5,8 +5,9 @@ import type { Problem } from './problems'
  * correct: 正解した直後(次の問題に切り替わるまでの短い間)
  * wrong:   不正解の直後(入力欄が空になるまでの短い間)
  * cleared: 最後の問題に正解した
+ * timeup:  チャレンジで時間ぎれになった
  */
-export type GamePhase = 'playing' | 'correct' | 'wrong' | 'cleared'
+export type GamePhase = 'playing' | 'correct' | 'wrong' | 'cleared' | 'timeup'
 
 export interface GameState {
   problems: Problem[]
@@ -15,6 +16,8 @@ export interface GameState {
   phase: GamePhase
   mistakes: number
   streak: number
+  /** 正解した問題の数 */
+  correctCount: number
 }
 
 export type GameAction =
@@ -26,12 +29,14 @@ export type GameAction =
   | { type: 'advance' }
   /** wrong → 同じ問題に答え直す */
   | { type: 'retry' }
+  /** チャレンジの時間ぎれ */
+  | { type: 'timeUp' }
 
 export const MAX_INPUT_DIGITS = 2
 
 export function createGame(problems: Problem[]): GameState {
   if (problems.length === 0) throw new Error('problems must not be empty')
-  return { problems, index: 0, input: '', phase: 'playing', mistakes: 0, streak: 0 }
+  return { problems, index: 0, input: '', phase: 'playing', mistakes: 0, streak: 0, correctCount: 0 }
 }
 
 export function currentProblem(state: GameState): Problem {
@@ -60,7 +65,12 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         return { ...state, phase: 'wrong', mistakes: state.mistakes + 1, streak: 0 }
       }
       const isLast = state.index === state.problems.length - 1
-      return { ...state, phase: isLast ? 'cleared' : 'correct', streak: state.streak + 1 }
+      return {
+        ...state,
+        phase: isLast ? 'cleared' : 'correct',
+        streak: state.streak + 1,
+        correctCount: state.correctCount + 1,
+      }
     }
     case 'advance':
       if (state.phase !== 'correct') return state
@@ -68,6 +78,9 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     case 'retry':
       if (state.phase !== 'wrong') return state
       return { ...state, input: '', phase: 'playing' }
+    case 'timeUp':
+      if (state.phase === 'cleared' || state.phase === 'timeup') return state
+      return { ...state, phase: 'timeup' }
   }
 }
 

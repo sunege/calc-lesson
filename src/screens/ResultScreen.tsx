@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react'
 import { playBest } from '../audio/sound'
 import { Mascot } from '../components/Mascot'
-import { TimeChart } from '../components/TimeChart'
+import { TIME_TICK_STEPS, timeLabelLines, timeTickLabel } from '../components/chartFormats'
+import { RecordChart } from '../components/RecordChart'
 import { getModeInfo, type ModeId } from '../domain/modes'
 import { formatFaster, formatTime, starCount, summarize, type PlayRecord, type ResultSummary } from '../domain/stats'
 import { fireBest, fireCorrect } from '../effects/confetti'
@@ -112,9 +113,18 @@ export function ResultScreen({ mode, records, onRetry, onBack }: Props) {
         <section className={styles.chartBox}>
           <h2 className={styles.chartTitle}>
             きみの きろく <span className={styles.chartHint}>(ぼうが みじかいほど はやい!)</span>
+            <span className={styles.playCount}>{summary.playCount}かいめ の ちょうせん</span>
           </h2>
           <div className={styles.chart}>
-            <TimeChart records={records} maxBars={narrow ? 5 : 10} />
+            <RecordChart
+              values={records.map((r) => r.timeMs)}
+              better="lower"
+              labelLines={timeLabelLines}
+              tickLabel={timeTickLabel}
+              tickSteps={TIME_TICK_STEPS}
+              maxBars={narrow ? 5 : 10}
+              ariaLabel="これまでの タイム の グラフ"
+            />
           </div>
           {fromFirst !== null && fromFirst > 0 && (
             <p className={styles.fromFirst}>
@@ -122,7 +132,6 @@ export function ResultScreen({ mode, records, onRetry, onBack }: Props) {
               なったよ!
             </p>
           )}
-          <p className={styles.playCount}>{summary.playCount}かいめ の ちょうせん</p>
         </section>
       </div>
     </div>

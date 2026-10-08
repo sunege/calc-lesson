@@ -1,0 +1,164 @@
+.badge {
+  display: inline-block;
+  vertical-align: middle;
+  font-size: 0.6em;
+  background: var(--theme);
+  color: #fff;
+  border-radius: 999px;
+  padding: 2px 12px;
+}
+
+/* ---------- のこり時間 ---------- */
+.clock span {
+  display: inline-block;
+  font-variant-numeric: tabular-nums;
+}
+
+.clock[data-level='warn'] {
+  background: #fff4c2;
+  border-color: #f5c400;
+}
+
+.clock[data-level='danger'],
+.clock[data-level='panic'] {
+  background: var(--wrong);
+  border-color: #c9364a;
+  color: #fff;
+}
+
+/* 1びょう ごとに どくん と ふくらむ */
+.clock[data-level='danger'] span {
+  animation: beat 1s ease-out;
+}
+
+.clock[data-level='panic'] span {
+  animation: beat 0.5s ease-out 2;
+}
+
+@keyframes beat {
+  0% {
+    transform: scale(1.5);
+  }
+  40% {
+    transform: scale(1);
+  }
+}
+
+.timeTrack .timeFill {
+  transition:
+    width 0.1s linear,
+    background 0.3s;
+}
+
+.timeTrack[data-level='warn'] .timeFill {
+  background: repeating-linear-gradient(-45deg, #ffc21a, #ffc21a 12px, #ffe38a 12px, #ffe38a 24px);
+}
+
+.timeTrack[data-level='danger'] .timeFill,
+.timeTrack[data-level='panic'] .timeFill {
+  background: repeating-linear-gradient(-45deg, var(--wrong), var(--wrong) 12px, #ff9aa6 12px, #ff9aa6 24px);
+  background-size: 34px 34px;
+  animation: stripes 0.5s linear infinite;
+}
+
+@keyframes stripes {
+  to {
+    background-position: 34px 0;
+  }
+}
+
+.shiver {
+  animation: shiver 0.15s linear infinite !important;
+}
+
+@keyframes shiver {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-2px) rotate(-3deg);
+  }
+  75% {
+    transform: translateX(2px) rotate(3deg);
+  }
+}
+
+/* ---------- 画面のふちの 赤い点めつ ---------- */
+.vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  opacity: 0;
+  border: 6px solid rgba(242, 73, 91, 0.9);
+  box-shadow: inset 0 0 80px 30px rgba(242, 73, 91, 0.7);
+}
+
+.vignette[data-level='danger'] {
+  animation: alarm 1s ease-in-out infinite;
+}
+
+.vignette[data-level='panic'] {
+  border-width: 10px;
+  box-shadow: inset 0 0 110px 44px rgba(242, 73, 91, 0.8);
+  animation: alarm 0.5s ease-in-out infinite;
+}
+
+@keyframes alarm {
+  0%,
+  100% {
+    opacity: 0.15;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ---------- さいごの 5びょう の カウントダウン ---------- */
+.bigCount {
+  font-size: min(60cqi, 60vh);
+  font-weight: 900;
+  line-height: 1;
+  color: var(--wrong);
+  opacity: 0.25;
+  animation: big-count 1s ease-out both;
+}
+
+@keyframes big-count {
+  0% {
+    transform: scale(1.6);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.25;
+  }
+}
+
+/* ---------- タイムアップ ---------- */
+.timeUpText {
+  font-size: clamp(56px, 13vmin, 140px);
+  font-weight: 900;
+  color: var(--wrong);
+  -webkit-text-stroke: 4px #fff;
+  paint-order: stroke fill;
+  text-shadow: 0 8px 0 rgba(59, 47, 42, 0.2);
+  animation: pop-in 0.5s ease-out;
+}
+
+.timeUpCount {
+  font-size: clamp(28px, 6vmin, 56px);
+  animation: pop-in 0.5s 0.3s ease-out both;
+}
+
+.timeUpCount strong {
+  font-size: 1.6em;
+  color: var(--theme);
+}
+
+@media (max-width: 600px), (max-height: 520px) {
+  .badge {
+    display: none;
+  }
+}

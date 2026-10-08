@@ -1,0 +1,151 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.back {
+  min-height: 60px;
+  padding: 0 22px;
+  font-size: 22px;
+  border: 3px solid var(--line);
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(28px, 5vmin, 44px);
+  color: var(--theme);
+}
+
+.title small {
+  font-size: 0.55em;
+  color: var(--ink-soft);
+}
+
+.question {
+  margin: 0;
+  text-align: center;
+  font-size: clamp(26px, 4.6vmin, 40px);
+}
+
+.choices {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+@media (max-width: 600px) {
+  .choices {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+.choice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: clamp(260px, 52vh, 480px);
+  padding: 20px 16px;
+  border: 5px solid var(--theme);
+  background: linear-gradient(180deg, var(--surface) 55%, var(--theme-soft));
+  text-align: center;
+}
+
+.choice[data-kind='challenge'] {
+  border-color: var(--wrong);
+  background: linear-gradient(180deg, var(--surface) 55%, var(--wrong-soft));
+}
+
+.icon {
+  font-size: clamp(56px, 10vmin, 84px);
+  line-height: 1.1;
+}
+
+.choice[data-kind='challenge'] .icon {
+  animation: wobble 1.2s ease-in-out infinite;
+}
+
+@keyframes wobble {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  10% {
+    transform: rotate(-12deg);
+  }
+  20% {
+    transform: rotate(12deg);
+  }
+  30% {
+    transform: rotate(0);
+  }
+}
+
+.name {
+  font-size: clamp(34px, 6vmin, 52px);
+  font-weight: 900;
+  color: var(--theme);
+}
+
+.choice[data-kind='challenge'] .name {
+  color: var(--wrong);
+}
+
+.desc {
+  font-size: clamp(17px, 2.8vmin, 22px);
+}
+
+.record {
+  margin-top: 12px;
+  font-size: 17px;
+  background: var(--surface);
+  border-radius: 999px;
+  padding: 4px 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 600px) {
+  .root {
+    gap: 12px;
+  }
+
+  .back {
+    min-height: 48px;
+    font-size: 18px;
+  }
+
+  .choice {
+    min-height: 0;
+    padding: 12px;
+    gap: 2px;
+  }
+
+  .icon {
+    font-size: 40px;
+  }
+
+  .name {
+    font-size: 30px;
+  }
+
+  .desc {
+    font-size: 15px;
+  }
+
+  .record {
+    margin-top: 6px;
+    font-size: 15px;
+  }
+}

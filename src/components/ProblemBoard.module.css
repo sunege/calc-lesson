@@ -1,0 +1,278 @@
+.problemArea {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  /* もんだいの 文字の大きさを、この場所の はばに あわせる */
+  container-type: inline-size;
+}
+
+/* ---------- もんだい カード ---------- */
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25em;
+  font-size: clamp(40px, min(14cqi, 17vh), 150px);
+  font-weight: 900;
+  line-height: 1;
+  background: var(--surface);
+  border: 5px solid var(--theme-soft);
+  border-radius: 40px;
+  padding: 0.35em 0.45em;
+  box-shadow: 0 10px 0 var(--theme-soft);
+  font-variant-numeric: tabular-nums;
+  animation: pop-in 0.22s ease-out;
+  max-width: 100%;
+}
+
+.num {
+  min-width: 0.6em;
+  text-align: center;
+}
+
+.op {
+  font-size: 0.8em;
+}
+
+.plus {
+  color: var(--op-plus);
+}
+
+.minus {
+  color: var(--op-minus);
+}
+
+.times {
+  color: var(--op-times);
+}
+
+.answer {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5em;
+  height: 1.3em;
+  padding: 0 0.12em;
+  border: 5px dashed var(--theme);
+  border-radius: 20px;
+  background: var(--theme-soft);
+  color: var(--ink);
+  transition:
+    background 0.1s,
+    border-color 0.1s;
+}
+
+.answer[data-digits='2'] {
+  min-width: 1.9em;
+}
+
+.caret {
+  width: 5px;
+  height: 0.8em;
+  background: var(--theme);
+  border-radius: 3px;
+  margin-left: 0.05em;
+  animation: blink 1s steps(1) infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.card[data-phase='correct'] .answer,
+.card[data-phase='cleared'] .answer {
+  border-style: solid;
+  border-color: var(--correct);
+  background: #d7f8df;
+  color: var(--correct);
+  animation: glow 0.3s ease-out;
+}
+
+@keyframes glow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(32, 176, 75, 0.8);
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.18);
+  }
+  100% {
+    box-shadow: 0 0 0 28px rgba(32, 176, 75, 0);
+    transform: scale(1);
+  }
+}
+
+.card[data-phase='wrong'] {
+  animation: shake 0.3s ease-in-out;
+  border-color: var(--wrong-soft);
+}
+
+.card[data-phase='wrong'] .answer {
+  border-style: solid;
+  border-color: var(--wrong);
+  background: var(--wrong-soft);
+  color: var(--wrong);
+}
+
+.cross {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 1.2em;
+  color: var(--wrong);
+  animation: pop-in 0.2s ease-out;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-18px) rotate(-2deg);
+  }
+  40% {
+    transform: translateX(16px) rotate(2deg);
+  }
+  60% {
+    transform: translateX(-10px);
+  }
+  80% {
+    transform: translateX(6px);
+  }
+}
+
+/* ---------- ほめことば(入力を じゃましない かさね表示) ---------- */
+.popups {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 28%;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.popup {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  font-size: clamp(32px, 6vmin, 60px);
+  font-weight: 900;
+  white-space: nowrap;
+  -webkit-text-stroke: 2px #fff;
+  paint-order: stroke fill;
+  text-shadow: 0 4px 0 rgba(59, 47, 42, 0.2);
+  animation: praise 0.9s ease-out forwards;
+}
+
+.praise {
+  color: var(--correct);
+}
+
+.combo {
+  color: #ff6a00;
+  font-size: clamp(40px, 8vmin, 76px);
+  animation-name: combo;
+  animation-duration: 1.2s;
+}
+
+.wrong {
+  color: var(--wrong);
+  font-size: clamp(26px, 4.6vmin, 44px);
+}
+
+@keyframes praise {
+  0% {
+    transform: translate(-50%, 20%) scale(0.4);
+    opacity: 0;
+  }
+  20% {
+    transform: translate(-50%, -50%) scale(1.15);
+    opacity: 1;
+  }
+  35% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -110%) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes combo {
+  0% {
+    transform: translate(-50%, -50%) scale(0.2) rotate(-20deg);
+    opacity: 0;
+  }
+  25% {
+    transform: translate(-50%, -50%) scale(1.3) rotate(6deg);
+    opacity: 1;
+  }
+  40% {
+    transform: translate(-50%, -50%) scale(1) rotate(0);
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -90%) scale(1.05);
+    opacity: 0;
+  }
+}
+
+/* スマホ向けの上書きは、ほかの指定より後ろに置く */
+@media (max-width: 600px), (max-height: 520px) {
+  .card {
+    border-width: 4px;
+    border-radius: 24px;
+    box-shadow: 0 6px 0 var(--theme-soft);
+  }
+
+  .answer {
+    border-width: 4px;
+    border-radius: 14px;
+  }
+}
+
+@media (orientation: portrait) and (max-width: 600px) {
+  .problemArea {
+    padding: 12px 0 4px;
+  }
+
+  .card {
+    font-size: clamp(36px, 15cqi, 72px);
+  }
+}
+
+/* 時間ぎれ: もんだいを うすく する */
+.card[data-phase='timeup'] {
+  opacity: 0.45;
+  filter: grayscale(0.6);
+  transition:
+    opacity 0.3s,
+    filter 0.3s;
+}
+
+/* もんだいの うしろに出す かざり(チャレンジの カウントダウン など) */
+.backdrop {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.card {
+  position: relative;
+  z-index: 1;
+}

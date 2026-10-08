@@ -40,5 +40,5 @@ export function useStopwatch(running: boolean, tickMs = 250) {
     return () => window.clearInterval(id)
   }, [active, elapsed, tickMs])
 
-  return { elapsed, display }
+  return { elapsed, display, active }
 }
