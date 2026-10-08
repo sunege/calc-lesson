@@ -1,0 +1,17 @@
+/* モードごとのテーマ色。data-theme をつけた要素の中で --theme / --theme-soft が使える */
+[data-theme='add'] {
+  --theme: var(--add);
+  --theme-soft: var(--add-soft);
+}
+[data-theme='sub'] {
+  --theme: var(--sub);
+  --theme-soft: var(--sub-soft);
+}
+[data-theme='kuku'] {
+  --theme: var(--kuku);
+  --theme-soft: var(--kuku-soft);
+}
+[data-theme='master'] {
+  --theme: var(--master);
+  --theme-soft: var(--master-soft);
+}

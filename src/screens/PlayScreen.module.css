@@ -1,0 +1,384 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1.5vmin, 14px);
+  overflow: hidden;
+}
+
+/* ---------- ヘッダー ---------- */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.quit {
+  min-height: 56px;
+  padding: 0 22px;
+  font-size: 22px;
+  border: 3px solid var(--line);
+}
+
+.title {
+  flex: 1;
+  font-size: clamp(22px, 3.6vmin, 32px);
+  font-weight: 900;
+  color: var(--theme);
+  white-space: nowrap;
+}
+
+.clock,
+.count {
+  background: var(--surface);
+  border-radius: 999px;
+  padding: 8px 20px;
+  font-size: clamp(20px, 3.2vmin, 28px);
+  border: 3px solid var(--line);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.countNow {
+  color: var(--theme);
+  font-size: 1.2em;
+}
+
+/* ---------- しんちょく ---------- */
+.track {
+  position: relative;
+  height: 22px;
+  margin: 30px 64px 0 28px;
+  background: var(--surface);
+  border: 3px solid var(--line);
+  border-radius: 999px;
+}
+
+.trackFill {
+  height: 100%;
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--theme),
+    var(--theme) 12px,
+    var(--theme-soft) 12px,
+    var(--theme-soft) 24px
+  );
+  border-radius: 999px;
+  transition: width 0.3s ease-out;
+}
+
+.trackRunner {
+  position: absolute;
+  bottom: 2px;
+  transform: translateX(-50%);
+  transition: left 0.3s ease-out;
+}
+
+.runnerMascot {
+  display: block;
+  animation: float 0.8s ease-in-out infinite;
+}
+
+.goal {
+  position: absolute;
+  right: -52px;
+  top: 50%;
+  transform: translateY(-60%);
+  font-size: 40px;
+}
+
+/* ---------- メイン ---------- */
+.main {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr minmax(300px, 40vw);
+  gap: clamp(12px, 2.5vmin, 32px);
+}
+
+.problemArea {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  /* もんだいの 文字の大きさを、この場所の はばに あわせる */
+  container-type: inline-size;
+}
+
+.padArea {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  max-height: 560px;
+  align-self: center;
+  height: 100%;
+}
+
+@media (orientation: portrait) {
+  .main {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr minmax(0, 52%);
+  }
+
+  .padArea {
+    max-width: 560px;
+    width: 100%;
+    justify-self: center;
+  }
+}
+
+/* ---------- もんだい カード ---------- */
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25em;
+  font-size: clamp(40px, min(14cqi, 17vh), 150px);
+  font-weight: 900;
+  line-height: 1;
+  background: var(--surface);
+  border: 5px solid var(--theme-soft);
+  border-radius: 40px;
+  padding: 0.35em 0.45em;
+  box-shadow: 0 10px 0 var(--theme-soft);
+  font-variant-numeric: tabular-nums;
+  animation: pop-in 0.22s ease-out;
+  max-width: 100%;
+}
+
+.num {
+  min-width: 0.6em;
+  text-align: center;
+}
+
+.op {
+  font-size: 0.8em;
+}
+
+.plus {
+  color: var(--op-plus);
+}
+
+.minus {
+  color: var(--op-minus);
+}
+
+.times {
+  color: var(--op-times);
+}
+
+.answer {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5em;
+  height: 1.3em;
+  padding: 0 0.12em;
+  border: 5px dashed var(--theme);
+  border-radius: 20px;
+  background: var(--theme-soft);
+  color: var(--ink);
+  transition:
+    background 0.1s,
+    border-color 0.1s;
+}
+
+.answer[data-digits='2'] {
+  min-width: 1.9em;
+}
+
+.caret {
+  width: 5px;
+  height: 0.8em;
+  background: var(--theme);
+  border-radius: 3px;
+  margin-left: 0.05em;
+  animation: blink 1s steps(1) infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.card[data-phase='correct'] .answer,
+.card[data-phase='cleared'] .answer {
+  border-style: solid;
+  border-color: var(--correct);
+  background: #d7f8df;
+  color: var(--correct);
+  animation: glow 0.3s ease-out;
+}
+
+@keyframes glow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(32, 176, 75, 0.8);
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.18);
+  }
+  100% {
+    box-shadow: 0 0 0 28px rgba(32, 176, 75, 0);
+    transform: scale(1);
+  }
+}
+
+.card[data-phase='wrong'] {
+  animation: shake 0.3s ease-in-out;
+  border-color: var(--wrong-soft);
+}
+
+.card[data-phase='wrong'] .answer {
+  border-style: solid;
+  border-color: var(--wrong);
+  background: var(--wrong-soft);
+  color: var(--wrong);
+}
+
+.cross {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 1.2em;
+  color: var(--wrong);
+  animation: pop-in 0.2s ease-out;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-18px) rotate(-2deg);
+  }
+  40% {
+    transform: translateX(16px) rotate(2deg);
+  }
+  60% {
+    transform: translateX(-10px);
+  }
+  80% {
+    transform: translateX(6px);
+  }
+}
+
+/* ---------- ほめことば(入力を じゃましない かさね表示) ---------- */
+.popups {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 28%;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.popup {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  font-size: clamp(32px, 6vmin, 60px);
+  font-weight: 900;
+  white-space: nowrap;
+  -webkit-text-stroke: 2px #fff;
+  paint-order: stroke fill;
+  text-shadow: 0 4px 0 rgba(59, 47, 42, 0.2);
+  animation: praise 0.9s ease-out forwards;
+}
+
+.praise {
+  color: var(--correct);
+}
+
+.combo {
+  color: #ff6a00;
+  font-size: clamp(40px, 8vmin, 76px);
+  animation-name: combo;
+  animation-duration: 1.2s;
+}
+
+.wrong {
+  color: var(--wrong);
+  font-size: clamp(26px, 4.6vmin, 44px);
+}
+
+@keyframes praise {
+  0% {
+    transform: translate(-50%, 20%) scale(0.4);
+    opacity: 0;
+  }
+  20% {
+    transform: translate(-50%, -50%) scale(1.15);
+    opacity: 1;
+  }
+  35% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -110%) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes combo {
+  0% {
+    transform: translate(-50%, -50%) scale(0.2) rotate(-20deg);
+    opacity: 0;
+  }
+  25% {
+    transform: translate(-50%, -50%) scale(1.3) rotate(6deg);
+    opacity: 1;
+  }
+  40% {
+    transform: translate(-50%, -50%) scale(1) rotate(0);
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -90%) scale(1.05);
+    opacity: 0;
+  }
+}
+
+/* ---------- クリア ---------- */
+.clearOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(255, 247, 230, 0.75);
+  animation: fade-in 0.2s ease-out;
+}
+
+.clearOverlay svg {
+  animation: pop-in 0.4s ease-out;
+}
+
+.clearText {
+  font-size: clamp(72px, 16vmin, 160px);
+  font-weight: 900;
+  color: var(--theme);
+  -webkit-text-stroke: 4px #fff;
+  paint-order: stroke fill;
+  text-shadow: 0 8px 0 rgba(59, 47, 42, 0.2);
+  animation: pop-in 0.5s ease-out;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}

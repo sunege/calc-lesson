@@ -1,0 +1,99 @@
+.chart {
+  display: block;
+  width: 100%;
+  height: auto;
+  font-family: inherit;
+  overflow: visible;
+}
+
+.grid {
+  stroke: var(--line);
+  stroke-width: 2;
+}
+
+.axis {
+  stroke: var(--ink);
+  stroke-width: 3;
+}
+
+.tick {
+  font-size: 18px;
+  fill: var(--ink-soft);
+}
+
+.axisLabel {
+  font-size: 18px;
+  fill: var(--ink-soft);
+}
+
+.bar {
+  fill: var(--theme-soft);
+  stroke: var(--theme);
+  stroke-width: 2;
+  transform-box: fill-box;
+  transform-origin: bottom;
+  animation: grow 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.latest {
+  fill: var(--theme);
+  animation-duration: 0.8s;
+}
+
+.best {
+  stroke: var(--gold);
+  stroke-width: 4;
+}
+
+.value {
+  font-size: 18px;
+  fill: var(--ink-soft);
+  animation: appear 0.3s ease-out both;
+}
+
+.valueLatest {
+  font-size: 22px;
+  fill: var(--theme);
+  font-weight: 900;
+}
+
+.crown {
+  font-size: 30px;
+  animation: crown 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.xLabel {
+  font-size: 18px;
+  fill: var(--ink-soft);
+}
+
+.nowLabel {
+  font-size: 18px;
+  fill: var(--theme);
+  font-weight: 900;
+}
+
+.bestLine {
+  stroke: var(--gold);
+  stroke-width: 3;
+  stroke-dasharray: 10 8;
+}
+
+@keyframes grow {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes crown {
+  from {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+}

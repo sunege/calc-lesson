@@ -1,0 +1,139 @@
+:root {
+  color-scheme: light;
+
+  --bg: #fff7e6;
+  --bg-dot: #ffe9bf;
+  --surface: #ffffff;
+  --ink: #3b2f2a;
+  --ink-soft: #7a6a60;
+  --line: #f0dcc0;
+
+  --add: #f2661b;
+  --add-soft: #ffe3cf;
+  --sub: #1f8fd6;
+  --sub-soft: #d6eefe;
+  --kuku: #23a35a;
+  --kuku-soft: #d5f4e1;
+  --master: #7b4dff;
+  --master-soft: #e9e0ff;
+  --gold: #ffc21a;
+
+  --op-plus: #f2453d;
+  --op-minus: #1f8fd6;
+  --op-times: #23a35a;
+
+  --correct: #20b04b;
+  --wrong: #f2495b;
+  --wrong-soft: #ffe1e5;
+
+  --shadow: 0 6px 0 rgba(59, 47, 42, 0.18);
+  --shadow-pressed: 0 2px 0 rgba(59, 47, 42, 0.18);
+  --radius: 24px;
+
+  font-family: 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', 'Hiragino Sans', sans-serif;
+  font-weight: 700;
+  color: var(--ink);
+  -webkit-text-size-adjust: 100%;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background-color: var(--bg);
+  background-image: radial-gradient(var(--bg-dot) 2.5px, transparent 2.5px);
+  background-size: 28px 28px;
+  overflow: hidden;
+  overscroll-behavior: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  /* わかちがき の すきまで だけ 改行する */
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible {
+  outline: 4px solid var(--sub);
+  outline-offset: 3px;
+}
+
+/* もちあがった ぼたん の きほん */
+.pop-button {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition:
+    transform 0.06s,
+    box-shadow 0.06s;
+}
+
+.pop-button:active,
+.pop-button[data-pressed='true'] {
+  transform: translateY(4px);
+  box-shadow: var(--shadow-pressed);
+}
+
+.screen {
+  height: 100%;
+  width: 100%;
+  overflow-y: auto;
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+    max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+}
+
+@keyframes pop-in {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

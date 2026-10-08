@@ -1,0 +1,27 @@
+.button {
+  position: relative;
+  overflow: hidden;
+  min-height: 48px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 3px solid var(--wrong);
+  color: var(--wrong);
+  background: var(--surface);
+  font-size: 16px;
+}
+
+.fill {
+  position: absolute;
+  inset: 0;
+  width: 0;
+  background: var(--wrong-soft);
+}
+
+.button[data-holding='true'] .fill {
+  width: 100%;
+  transition: width var(--hold-ms) linear;
+}
+
+.label {
+  position: relative;
+}

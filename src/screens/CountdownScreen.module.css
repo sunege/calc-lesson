@@ -1,0 +1,56 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+
+.mode {
+  font-size: clamp(28px, 5vmin, 44px);
+  color: var(--theme);
+}
+
+.mode small {
+  font-size: 0.6em;
+  color: var(--ink-soft);
+}
+
+.count,
+.go {
+  font-weight: 900;
+  line-height: 1;
+  -webkit-text-stroke: 6px #fff;
+  paint-order: stroke fill;
+  text-shadow: 0 10px 0 rgba(59, 47, 42, 0.15);
+}
+
+.count {
+  font-size: clamp(160px, 40vmin, 320px);
+  color: var(--theme);
+  animation: count 0.75s ease-out both;
+}
+
+.go {
+  font-size: clamp(72px, 16vmin, 160px);
+  color: var(--op-plus);
+  animation: pop-in 0.4s ease-out both;
+}
+
+@keyframes count {
+  0% {
+    transform: scale(2);
+    opacity: 0;
+  }
+  30% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+}

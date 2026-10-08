@@ -1,0 +1,107 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.mascot {
+  animation: float 1.6s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+.logo {
+  flex: 1;
+  margin: 0;
+  font-size: clamp(36px, 7vmin, 64px);
+  font-weight: 900;
+  color: var(--add);
+  -webkit-text-stroke: 3px #fff;
+  paint-order: stroke fill;
+  text-shadow: 0 5px 0 rgba(59, 47, 42, 0.15);
+  letter-spacing: 2px;
+}
+
+.logo span {
+  color: var(--sub);
+}
+
+.settings {
+  width: 64px;
+  height: 64px;
+  font-size: 32px;
+  border: 3px solid var(--line);
+  flex-shrink: 0;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.groupTitle {
+  margin: 0;
+  font-size: clamp(22px, 3.6vmin, 30px);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.badge {
+  background: var(--ink);
+  color: #fff;
+  border-radius: 999px;
+  padding: 4px 16px;
+  font-size: 0.8em;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 18px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-height: 170px;
+  padding: 16px 12px;
+  border: 4px solid var(--theme);
+  background: linear-gradient(180deg, var(--surface) 55%, var(--theme-soft));
+  text-align: center;
+}
+
+.icon {
+  font-size: 44px;
+  line-height: 1.1;
+}
+
+.cardTitle {
+  font-size: clamp(26px, 4vmin, 34px);
+  font-weight: 900;
+  color: var(--theme);
+}
+
+.cardSub {
+  font-size: 18px;
+  color: var(--ink-soft);
+}
+
+.cardRecord {
+  margin-top: auto;
+  font-size: 16px;
+  background: var(--surface);
+  border-radius: 999px;
+  padding: 2px 12px;
+  font-variant-numeric: tabular-nums;
+}

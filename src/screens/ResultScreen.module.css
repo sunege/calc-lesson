@@ -1,0 +1,210 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.mascot {
+  animation: float 1s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(36px, 7vmin, 64px);
+  font-weight: 900;
+  color: var(--theme);
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0 16px;
+  animation: pop-in 0.5s ease-out;
+}
+
+.modeName {
+  color: var(--ink);
+  font-size: 0.6em;
+}
+
+.modeSub {
+  color: var(--ink-soft);
+  font-size: 0.4em;
+}
+
+.body {
+  display: grid;
+  grid-template-columns: minmax(280px, 2fr) 3fr;
+  gap: 16px;
+}
+
+@media (orientation: portrait), (max-width: 760px) {
+  .body {
+    grid-template-columns: 1fr;
+  }
+}
+
+.summary,
+.chartBox {
+  background: var(--surface);
+  border-radius: 32px;
+  border: 4px solid var(--theme-soft);
+  padding: 20px 24px;
+}
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.statRow {
+  display: flex;
+  gap: 24px;
+}
+
+.statLabel {
+  font-size: 18px;
+  color: var(--ink-soft);
+}
+
+.time {
+  font-size: clamp(40px, 7vmin, 64px);
+  font-weight: 900;
+  color: var(--theme);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.statValue {
+  font-size: 32px;
+  font-weight: 900;
+}
+
+.stars {
+  font-size: 36px;
+  letter-spacing: 2px;
+}
+
+.starOn,
+.starOff {
+  display: inline-block;
+  animation: pop-in 0.4s ease-out both;
+}
+
+.starOn {
+  color: var(--gold);
+  -webkit-text-stroke: 1.5px #d49a00;
+}
+
+.starOff {
+  color: #e6dcd2;
+}
+
+.hanamaru {
+  font-size: 30px;
+  color: #ff4f8b;
+  animation: pop-in 0.5s 0.8s ease-out both;
+}
+
+.messages p {
+  margin: 4px 0;
+  line-height: 1.5;
+}
+
+.message {
+  font-size: clamp(20px, 3.4vmin, 26px);
+}
+
+.bestMessage {
+  font-size: clamp(24px, 4.2vmin, 34px);
+  font-weight: 900;
+  color: #e09600;
+  animation: pop-in 0.6s 0.4s ease-out both;
+}
+
+.chartTitle {
+  margin: 0 0 8px;
+  font-size: 24px;
+}
+
+.chartHint {
+  font-size: 18px;
+  color: var(--ink-soft);
+}
+
+.fromFirst {
+  margin: 10px 0 0;
+  font-size: clamp(20px, 3.2vmin, 26px);
+  text-align: center;
+}
+
+.fromFirst strong {
+  color: var(--theme);
+  font-size: 1.2em;
+}
+
+.playCount {
+  margin: 4px 0 0;
+  text-align: right;
+  color: var(--ink-soft);
+  font-size: 16px;
+}
+
+.buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  padding-bottom: 8px;
+}
+
+.buttons button {
+  min-height: 80px;
+  min-width: 220px;
+  font-size: 28px;
+  border: 4px solid var(--line);
+}
+
+.retry {
+  background: var(--theme) !important;
+  border-color: transparent !important;
+  color: #fff;
+}
+
+.crownDrop {
+  position: fixed;
+  left: 50%;
+  top: 0;
+  z-index: 60;
+  font-size: 160px;
+  pointer-events: none;
+  animation: crown-drop 2.2s ease-in forwards;
+}
+
+@keyframes crown-drop {
+  0% {
+    transform: translate(-50%, -200px) rotate(-20deg);
+  }
+  35% {
+    transform: translate(-50%, 30vh) rotate(10deg);
+  }
+  45% {
+    transform: translate(-50%, 26vh) rotate(-6deg) scale(1.1);
+  }
+  80% {
+    transform: translate(-50%, 28vh) rotate(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, 28vh) scale(1.6);
+    opacity: 0;
+  }
+}
