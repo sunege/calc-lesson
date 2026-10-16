@@ -5,9 +5,10 @@ import { parseKukuMode, type KukuOrder, type ModeId } from './domain/modes'
 import { ChallengePlayScreen } from './screens/ChallengePlayScreen'
 import { ChallengeResultScreen } from './screens/ChallengeResultScreen'
 import { CountdownScreen } from './screens/CountdownScreen'
-import { KukuSelectScreen } from './screens/KukuSelectScreen'
+import { KukuSelectScreen, type KukuView } from './screens/KukuSelectScreen'
 import { ModeMenuScreen } from './screens/ModeMenuScreen'
 import { PlayScreen } from './screens/PlayScreen'
+import { RecordsScreen } from './screens/RecordsScreen'
 import { ResultScreen } from './screens/ResultScreen'
 import { SettingsScreen } from './screens/SettingsScreen'
 import { TitleScreen } from './screens/TitleScreen'
@@ -18,10 +19,12 @@ export type Session = { kind: 'practice'; mode: ModeId } | { kind: 'challenge'; 
 
 type Screen =
   | { name: 'title' }
-  | { name: 'kuku' }
+  | { name: 'kuku'; view?: KukuView }
   | { name: 'settings' }
   /** れんしゅう と チャレンジ を えらぶ */
   | { name: 'menu'; mode: ChallengeModeId }
+  /** れんしゅう・チャレンジ の きろく を見る */
+  | { name: 'records'; session: Session }
   | { name: 'countdown'; session: Session }
   | { name: 'play'; session: Session }
   | { name: 'result'; session: Session }
@@ -33,13 +36,27 @@ export default function App() {
   // 「もういちど」で プレイ画面を作り直すための番号
   const [playId, setPlayId] = useState(0)
 
-  const start = useCallback((session: Session) => {
-    // iOS では、タップの中で音を有効にしておく必要がある
-    unlockAudio()
-    const kuku = parseKukuMode(session.mode)
+  /** 九九の段なら、えらんだ じゅんばん を おぼえておく(段選択に もどったときに使う) */
+  const rememberKukuOrder = useCallback((mode: ModeId) => {
+    const kuku = parseKukuMode(mode)
     if (kuku) setKukuOrder(kuku.order)
-    setScreen({ name: 'countdown', session })
   }, [])
+
+  const start = useCallback(
+    (session: Session) => {
+      // iOS では、タップの中で音を有効にしておく必要がある
+      unlockAudio()
+      rememberKukuOrder(session.mode)
+      setScreen({ name: 'countdown', session })
+    },
+    [rememberKukuOrder],
+  )
+
+  /** きろく画面を ひらく */
+  const showRecords = (session: Session) => {
+    rememberKukuOrder(session.mode)
+    setScreen({ name: 'records', session })
+  }
 
   /** タイトルや九九の段から えらんだとき */
   const select = (mode: ModeId) => {
@@ -67,7 +84,15 @@ export default function App() {
         />
       )
     case 'kuku':
-      return <KukuSelectScreen initialOrder={kukuOrder} onStart={select} onBack={() => setScreen({ name: 'title' })} />
+      return (
+        <KukuSelectScreen
+          initialOrder={kukuOrder}
+          initialView={screen.view}
+          onStart={select}
+          onRecords={(mode) => showRecords({ kind: 'practice', mode })}
+          onBack={() => setScreen({ name: 'title' })}
+        />
+      )
     case 'settings':
       return <SettingsScreen onBack={() => setScreen({ name: 'title' })} />
     case 'menu': {
@@ -77,8 +102,21 @@ export default function App() {
           mode={mode}
           onPractice={() => start({ kind: 'practice', mode })}
           onChallenge={() => start({ kind: 'challenge', mode })}
+          onRecords={(kind) => showRecords({ kind, mode })}
           onBack={() => setScreen({ name: 'title' })}
         />
+      )
+    }
+    case 'records': {
+      const { session } = screen
+      // 九九の段は、つづけて ほかの段の きろく も見られるように、きろく の きりかえ を したまま もどる
+      const onBack = () =>
+        parseKukuMode(session.mode) ? setScreen({ name: 'kuku', view: 'records' }) : backToChooser(session.mode)
+      const common = { onPlay: () => start(session), onBack }
+      return session.kind === 'challenge' ? (
+        <RecordsScreen kind="challenge" mode={session.mode} records={data.challenges[session.mode] ?? []} {...common} />
+      ) : (
+        <RecordsScreen kind="practice" mode={session.mode} records={data.records[session.mode] ?? []} {...common} />
       )
     }
     case 'countdown': {

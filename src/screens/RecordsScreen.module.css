@@ -1,0 +1,104 @@
+.header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+}
+
+.back {
+  min-height: 60px;
+  padding: 0 22px;
+  font-size: 22px;
+  border: 3px solid var(--line);
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(28px, 5vmin, 44px);
+  color: var(--theme);
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0 16px;
+}
+
+.modeName {
+  color: var(--ink);
+  font-size: 0.7em;
+}
+
+.modeName small {
+  color: var(--ink-soft);
+  font-size: 0.7em;
+}
+
+.play {
+  margin-left: auto;
+  min-height: 72px;
+  min-width: 200px;
+  padding: 0 20px;
+  font-size: 26px;
+  background: var(--theme) !important;
+  color: #fff;
+}
+
+/* ---------- まだ きろく が ない とき ---------- */
+.empty {
+  justify-content: center;
+  gap: 16px 24px;
+  padding: 32px 24px;
+}
+
+.empty p {
+  margin: 0;
+}
+
+.emptyTitle {
+  font-size: clamp(26px, 4.6vmin, 38px);
+  font-weight: 900;
+  color: var(--theme);
+}
+
+/* ---------- いちばん いい ひょうか ---------- */
+.rank {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rankIcon {
+  font-size: clamp(52px, 9vmin, 84px);
+  line-height: 1;
+}
+
+.rankName {
+  font-size: clamp(32px, 6vmin, 56px);
+  font-weight: 900;
+  color: var(--theme);
+  line-height: 1.1;
+}
+
+.next {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--wrong);
+}
+
+@media (max-width: 600px) {
+  .back {
+    min-height: 48px;
+    padding: 0 16px;
+    font-size: 18px;
+  }
+
+  .title {
+    font-size: 28px;
+  }
+
+  /* 「○○ する」は よこ いっぱいに */
+  .play {
+    width: 100%;
+    min-height: 60px;
+    font-size: 20px;
+  }
+}

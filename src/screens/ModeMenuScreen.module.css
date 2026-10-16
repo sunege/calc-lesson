@@ -56,7 +56,8 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: clamp(260px, 52vh, 480px);
+  flex: 1 1 auto;
+  min-height: clamp(220px, 42vh, 420px);
   padding: 20px 16px;
   border: 5px solid var(--theme);
   background: linear-gradient(180deg, var(--surface) 55%, var(--theme-soft));
@@ -107,10 +108,39 @@
   font-size: clamp(17px, 2.8vmin, 22px);
 }
 
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ---------- きろく ボタン(カードの すぐ下) ---------- */
+.records {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  min-height: 72px;
+  padding: 8px 16px;
+  border: 4px solid var(--theme);
+  color: var(--theme);
+}
+
+.records[data-kind='challenge'] {
+  border-color: var(--wrong);
+  color: var(--wrong);
+}
+
+.recordsLabel {
+  font-size: 26px;
+  font-weight: 900;
+}
+
 .record {
-  margin-top: 12px;
-  font-size: 17px;
-  background: var(--surface);
+  font-size: 18px;
+  color: var(--ink);
+  background: var(--bg);
   border-radius: 999px;
   padding: 4px 14px;
   font-variant-numeric: tabular-nums;
@@ -144,8 +174,20 @@
     font-size: 15px;
   }
 
+  .column {
+    gap: 8px;
+  }
+
+  .records {
+    min-height: 56px;
+    padding: 6px 12px;
+  }
+
+  .recordsLabel {
+    font-size: 20px;
+  }
+
   .record {
-    margin-top: 6px;
     font-size: 15px;
   }
 }

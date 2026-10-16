@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { playBest, playClear } from '../audio/sound'
 import { COUNT_TICK_STEPS, countLabelLines, countTickLabel } from '../components/chartFormats'
 import { Mascot } from '../components/Mascot'
+import { RankLadder } from '../components/RankLadder'
 import { RecordChart } from '../components/RecordChart'
 import {
   RANKS,
@@ -140,19 +141,7 @@ export function ChallengeResultScreen({ mode, records, onRetry, onBack }: Props)
         </section>
 
         {/* ランクの だんだん。つぎのランクまで あと何問かを見せる */}
-        <section className={styles.ladder} aria-label="ランク">
-          {RANKS.map((r, i) => (
-            <div
-              key={r.id}
-              className={styles.step}
-              data-state={i < rank.index ? 'passed' : i === rank.index ? 'current' : 'locked'}
-            >
-              <span className={styles.stepIcon}>{r.icon}</span>
-              <span className={styles.stepName}>{r.name}</span>
-              <span className={styles.stepNeed}>{thresholds[i]}もん〜</span>
-            </div>
-          ))}
-        </section>
+        <RankLadder mode={mode} currentIndex={rank.index} />
 
         <section className={base.chartBox}>
           <h2 className={base.chartTitle}>

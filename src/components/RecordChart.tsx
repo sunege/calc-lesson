@@ -7,7 +7,7 @@ export interface ChartGuide {
 }
 
 interface Props {
-  /** 古い順。最後の値を「こんかい」として強調する */
+  /** 古い順。最後の値を強調する */
   values: readonly number[]
   /** 小さいほど よい(タイム)か、大きいほど よい(といた数)か */
   better: 'lower' | 'higher'
@@ -20,6 +20,8 @@ interface Props {
   maxBars?: number
   /** よこに引く 目じるし(ランクの さかいめ など)。右はしに label を出す */
   guides?: readonly ChartGuide[]
+  /** 最後の ぼう の下に出す ことば */
+  latestLabel?: string
   ariaLabel: string
 }
 
@@ -71,6 +73,7 @@ export function RecordChart({
   tickSteps,
   maxBars = 10,
   guides = [],
+  latestLabel = 'こんかい',
   ariaLabel,
 }: Props) {
   if (values.length === 0) return null
@@ -186,7 +189,7 @@ export function RecordChart({
             </text>
             {isLatest && (
               <text x={cx} y={H - M.bottom + 52} className={styles.nowLabel} textAnchor="middle">
-                こんかい
+                {latestLabel}
               </text>
             )}
           </g>
